@@ -1,66 +1,52 @@
 { pkgs, ... }: {
-  # The channel determines which package versions are available.
-  channel = "stable-24.05"; # or "unstable"
+  # The Nix channel determines which versions of packages are available.
+  # 'stable-24.05' is a good choice for most projects.
+  channel = "stable-24.05";
 
-  # A list of packages to install from the specified channel.
+  # This is a list of all the packages that will be installed in your
+  # environment. You can find more packages at https://search.nixos.org/packages.
   packages = [
-    pkgs.python3
-    pkgs.android-studio
-    pkgs.jdk
-    pkgs.gradle
     pkgs.nodejs_20
-    # Added tree-sitter for universal code parsing
-    pkgs.tree-sitter
     pkgs.typescript
     pkgs.nodePackages.ts-node
-    # Added unzip for gradle
-    pkgs.unzip
-    # The Jin summoner command
-    (pkgs.callPackage ./.idx/jin.nix { })
+    pkgs.python3
+    pkgs.pip
+    pkgs.svelte-language-server
   ];
 
-  # A set of environment variables to define within the workspace.
+  # These are environment variables that will be available in your workspace.
   env = {
     API_KEY = "your-secret-key";
-    # Set JAVA_HOME for Android builds
-    JAVA_HOME = "${pkgs.jdk}";
-    # Set ANDROID_HOME for Android builds
-    ANDROID_HOME = "${pkgs.android-studio}/share/android-sdk";
-    NIXPKGS_ALLOW_UNFREE = 1;
   };
 
-  # A list of VS Code extensions to install from the Open VSX Registry.
+  # This section configures the IDE itself.
   idx = {
+    # A list of VS Code extensions to install from the Open VSX Registry.
     extensions = [
-      "vscodevim.vim",
-      "ms-python.python",
-      "dbaeumer.vscode-eslint",
-      "vscjava.vscode-java-pack",
-      "naco-siren.gradle-language"
+      "vscodevim.vim"
+      "svelte.svelte-vscode"
+      "ms-python.python"
     ];
-
+    
     # Workspace lifecycle hooks.
     workspace = {
       # Runs when a workspace is first created.
       onCreate = {
         npm-install = "npm install";
-        # Install tree-sitter libraries for Python
-        pip-install-treesitter = "pip install tree-sitter tree-sitter-languages";
-        # Install all other python dependencies for the project
-        pip-install-reqs = "pip install -r requirements.txt";
+        pip-install = "pip install -r requirements.txt";
       };
       # Runs every time the workspace is (re)started.
       onStart = {
-        check-java-home = "echo JAVA_HOME onStart: $JAVA_HOME";
+        start-server = "npm run dev";
       };
     };
 
-    # Configure a web preview for the API bridge.
+    # Configure a web preview for your application.
     previews = {
       enable = true;
       previews = {
-        api = {
-          command = ["python" "api_bridge.py"];
+        web = {
+          command = ["npm" "run" "dev" "--" "--port" "$PORT"];
           manager = "web";
         };
       };
