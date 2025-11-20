@@ -1,0 +1,6 @@
+{
+    "dart.flutterAdbConnectOnChromeOs": true,
+    "dart.flutterAdditionalArgs": [
+        ""
+    ]
+}
