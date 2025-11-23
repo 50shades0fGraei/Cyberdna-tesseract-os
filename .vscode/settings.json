@@ -2,5 +2,7 @@
     "dart.flutterAdbConnectOnChromeOs": true,
     "dart.flutterAdditionalArgs": [
         ""
-    ]
+    ],
+    "dart.flutterShowWebServerDevice": "always",
+    "dart.useFlutterDev": false
 }
