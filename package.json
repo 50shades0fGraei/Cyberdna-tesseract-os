@@ -1,16 +1,105 @@
 {
-  "name": "codemap-dna-tesseract",
+  "name": "codemap-os",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "CodemapOS - Function-driven Operating System Layer",
+  "main": "electron/main.js",
+  "homepage": "./",
+  "author": "Codemap Team",
+  "license": "Proprietary",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "concurrently \"npm run react-dev\" \"npm run electron-dev\"",
+    "react-dev": "react-scripts start",
+    "react-build": "react-scripts build",
+    "electron-dev": "wait-on http://localhost:3000 && electron .",
+    "electron-build": "npm run react-build && electron-builder",
+    "electron-build-win": "npm run react-build && electron-builder --win --publish never",
+    "electron-build-all": "npm run react-build && electron-builder -mwl",
+    "release": "npm run react-build && electron-builder --publish always",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "test": "react-scripts test --watchAll=false"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "axios": "^1.6.0",
+    "electron-updater": "^6.1.0",
+    "electron-store": "^8.1.0"
+  },
   "devDependencies": {
+    "react-scripts": "5.0.1",
+    "electron": "^27.0.0",
+    "electron-builder": "^24.6.0",
+    "electron-notarize": "^1.2.2",
+    "concurrently": "^8.2.0",
+    "wait-on": "^7.0.1",
     "@types/node": "^24.9.2",
     "typescript": "^5.0.0"
+  },
+  "build": {
+    "appId": "com.codemap.os",
+    "productName": "CodemapOS",
+    "directories": {
+      "buildResources": "assets",
+      "output": "dist"
+    },
+    "files": [
+      "build/**/*",
+      "electron/**/*",
+      "python/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        },
+        {
+          "target": "msi",
+          "arch": ["x64"]
+        }
+      ],
+      "certificateFile": "${env.WIN_CERT_FILE}",
+      "certificatePassword": "${env.WIN_CERT_PASSWORD}",
+      "signingHashAlgorithms": ["sha256"],
+      "sign": "./scripts/customSign.js"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "CodemapOS",
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico",
+      "installerHeaderIcon": "assets/icon.ico"
+    },
+    "msi": {
+      "certificateFile": "${env.WIN_CERT_FILE}",
+      "certificatePassword": "${env.WIN_CERT_PASSWORD}",
+      "signingHashAlgorithms": ["sha256"]
+    },
+    "mac": {
+      "target": ["dmg", "zip"],
+      "certificateFile": "${env.MAC_CERT_FILE}",
+      "certificatePassword": "${env.MAC_CERT_PASSWORD}",
+      "hardenedRuntime": true,
+      "entitlements": "assets/entitlements.mac.plist",
+      "entitlementsInherit": "assets/entitlements.mac.plist"
+    },
+    "dmg": {
+      "artifactName": "${productName}-${version}.${ext}"
+    },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "category": "Utility"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "50shades0fgraei",
+      "repo": "codemap-os-releases"
+    }
   }
 }

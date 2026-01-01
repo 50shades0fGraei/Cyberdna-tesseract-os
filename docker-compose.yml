@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  builder:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: codemap-os-builder
+    volumes:
+      # Output directory
+      - ./dist:/dist
+      # Optional: cache npm modules
+      - node_modules:/app/node_modules
+      # Optional: certificate for signing
+      - ./scripts/cert.pfx:/app/cert.pfx:ro
+    environment:
+      # Code signing (optional)
+      - WIN_CERT_FILE=/app/cert.pfx
+      - WIN_CERT_PASSWORD=${WIN_CERT_PASSWORD:-}
+      # Build configuration
+      - NODE_ENV=production
+      - ELECTRON_BUILDER_ARGS=--win --publish never
+    working_dir: /app
+    command: >
+      sh -c "
+        echo '🔨 Building CodemapOS...'
+        npm ci &&
+        npm run react-build &&
+        npm run electron-build &&
+        echo '✅ Build complete! Installers in /dist' &&
+        ls -lh /dist/
+      "
+
+  # Optional: development server
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: codemap-os-dev
+    ports:
+      - "3000:3000"
+      - "9222:9222"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    working_dir: /app
+    command: npm run dev
+
+volumes:
+  node_modules:

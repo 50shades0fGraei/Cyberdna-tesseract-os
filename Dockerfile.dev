@@ -1,0 +1,21 @@
+# Development Dockerfile for local testing
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Install dependencies including Python and build tools
+RUN apk add --no-cache \
+    python3 \
+    py3-pip \
+    build-base \
+    git
+
+# Copy and install
+COPY package*.json ./
+RUN npm install
+
+# Expose ports
+EXPOSE 3000 9222
+
+# Default command
+CMD ["npm", "run", "dev"]
