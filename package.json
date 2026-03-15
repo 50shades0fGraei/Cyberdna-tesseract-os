@@ -4,7 +4,7 @@
   "description": "CodemapOS - Function-driven Operating System Layer",
   "main": "electron/main.js",
   "homepage": "./",
-  "author": "Codemap Team",
+  "author": "randall lujan and ai",
   "license": "Proprietary",
   "scripts": {
     "dev": "concurrently \"npm run react-dev\" \"npm run electron-dev\"",
